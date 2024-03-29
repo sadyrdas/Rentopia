@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Setter
+@Table(name = "customer")
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

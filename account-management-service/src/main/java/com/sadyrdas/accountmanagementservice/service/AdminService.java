@@ -36,7 +36,7 @@ public class AdminService {
 
     public List<UserResponse> getAllAdmins(){
         List<User> users = userRepository.findAllByRole(UserRole.ADMIN);
-        List<UserResponse> adminResponseList = new ArrayList<UserResponse>();
+        List<UserResponse> adminResponseList = new ArrayList<>();
         for (User user : users){
             UserResponse userResponse = new UserResponse();
             userResponse.setName(user.getName());
@@ -44,6 +44,7 @@ public class AdminService {
             userResponse.setNickName(user.getNickName());
             adminResponseList.add(userResponse);
         }
+        log.info("You got all admins. Count is {}", adminResponseList.size());
         return adminResponseList;
     }
 }

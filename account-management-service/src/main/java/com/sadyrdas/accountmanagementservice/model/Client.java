@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@DiscriminatorValue("Client")
+@DiscriminatorValue("CLIENT")
 @SuperBuilder
 @AllArgsConstructor
 public class Client extends User{

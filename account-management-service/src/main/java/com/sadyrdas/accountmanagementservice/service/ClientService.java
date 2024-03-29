@@ -42,7 +42,7 @@ public class ClientService {
             userResponse.setNickName(user.getNickName());
             clientResponseList.add(userResponse);
         }
+        log.info("You got all clients. Count is {}", clientResponseList.size());
         return clientResponseList;
     }
-
 }

@@ -22,10 +22,9 @@ public class ClientController {
         clientService.registerClient(userRequest);
     }
 
-    @GetMapping("/clients")
+    @GetMapping("/allClients")
     @ResponseStatus(value = HttpStatus.OK)
     public List<UserResponse> getAllClients(){
         return clientService.getAllClients();
     }
-
 }
