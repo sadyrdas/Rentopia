@@ -50,4 +50,10 @@ public class EquipmentController {
         }
     }
 
+    @DeleteMapping("/deleteEquipment")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteEquipment(@RequestBody UpdateStatusEquipment updateStatusEquipment){
+        equipmentService.removeEquipment(updateStatusEquipment.getTitle());
+    }
+
 }

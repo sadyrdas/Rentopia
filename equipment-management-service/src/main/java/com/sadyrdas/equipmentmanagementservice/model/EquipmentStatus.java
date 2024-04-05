@@ -5,6 +5,8 @@ public enum EquipmentStatus {
     BROKEN,
     REPAIRED,
     TAKEN,
-    FREE
+    FREE,
+    REMOVED,
+    RESERVED
 
 }

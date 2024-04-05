@@ -86,12 +86,25 @@ public class EquipmentService {
                 Description description = new Description();
                 description.setInfo(descriptionInfo);
                 description.setLastUpdatedDate(LocalDateTime.now());
+                description.setEquipmentTitle(title);
                 equipment.get().setDescription(descriptionInfo);
                 descriptionRepository.insert(description);
                 equipmentRepository.save(equipment.get());
             }else {
                 log.error("Description already exists");
             }
+        }else {
+            log.error("Equipment {} not found", title);
+        }
+    }
+
+    public void removeEquipment(String title){
+        Optional<Equipment> equipment = equipmentRepository.findByTitle(title);
+        Optional<Description> description = descriptionRepository.findByEquipmentTitle(title);
+        if (equipment.isPresent() || description.isPresent()){
+            equipmentRepository.delete(equipment.get());
+            descriptionRepository.delete(description.get());
+            log.info("Equipment {} was removed", title);
         }else {
             log.error("Equipment {} not found", title);
         }
