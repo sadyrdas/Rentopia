@@ -1,8 +1,6 @@
 package com.sadyrdas.equipmentreservationservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,11 +14,14 @@ import java.time.LocalDateTime;
 @Setter
 public class ReservationWindow {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationWindowId;
     private String title;
     private int duration;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String meetingDate;
+    private LocalDateTime meetingDate;
+    private String titleOfEquipment;
+    private String clientEmail;
     //TODO Add fields for client and equipment after adding WebClient
 }

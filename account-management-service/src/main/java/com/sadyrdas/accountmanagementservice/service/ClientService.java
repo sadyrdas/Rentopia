@@ -45,4 +45,13 @@ public class ClientService {
         log.info("You got all clients. Count is {}", clientResponseList.size());
         return clientResponseList;
     }
+
+    public User getClientByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null){
+            log.error("Client with email {} not found", email);
+        }
+        log.info("You got client with email {}", email);
+        return user;
+    }
 }

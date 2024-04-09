@@ -2,6 +2,7 @@ package com.sadyrdas.accountmanagementservice.controller;
 
 import com.sadyrdas.accountmanagementservice.dto.UserRequest;
 import com.sadyrdas.accountmanagementservice.dto.UserResponse;
+import com.sadyrdas.accountmanagementservice.model.User;
 import com.sadyrdas.accountmanagementservice.model.UserRole;
 import com.sadyrdas.accountmanagementservice.service.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,17 @@ public class ClientController {
     @ResponseStatus(value = HttpStatus.OK)
     public List<UserResponse> getAllClients(){
         return clientService.getAllClients();
+    }
+
+    @GetMapping("/getClientByEmail")
+    @ResponseStatus(value = HttpStatus.OK)
+    public UserResponse getClientByEmail(@RequestParam String email){
+        User user = clientService.getClientByEmail(email);
+        UserResponse userResponse = new UserResponse();
+        userResponse.setName(user.getName());
+        userResponse.setSurname(user.getSurname());
+        userResponse.setNickName(user.getNickName());
+        userResponse.setEmail(user.getEmail());
+        return userResponse;
     }
 }

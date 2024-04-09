@@ -1,39 +1,119 @@
 package com.sadyrdas.equipmentreservationservice.service;
 
-import com.sadyrdas.equipmentreservationservice.ReservationWindowCreateRequest;
+import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowAddedTime;
+import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowCreateRequest;
+import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowResponse;
 import com.sadyrdas.equipmentreservationservice.model.ReservationWindow;
 import com.sadyrdas.equipmentreservationservice.repository.ReservationWindowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ReservationWindowService {
     private final ReservationWindowRepository reservationWindowRepository;
+    private final WebClient webClient;
 
     public void createReservationWindow(ReservationWindowCreateRequest reservationWindowCreateRequest) {
-        ReservationWindow reservationWindow = ReservationWindow.builder()
-                .duration(reservationWindowCreateRequest.getDuration())
-                .startDate(LocalDateTime.parse(reservationWindowCreateRequest.getStartDate()))
-                .endDate(LocalDateTime.parse(reservationWindowCreateRequest.getEndDate()))
-                .build();
+        String title = reservationWindowCreateRequest.getEquipmentTitle();
+        String clientEmail = reservationWindowCreateRequest.getClientEmail();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime startDateTime = LocalDateTime.parse(reservationWindowCreateRequest.getStartDate(), formatter);
+        LocalDateTime endDateTime = startDateTime.plusHours(reservationWindowCreateRequest.getDuration());
 
         //TODO Add info about client and about equipment, which were added
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host("localhost")
+                        .port(8081)
+                        .path("/api/equipment/management/getEquipmentByTitle")
+                        .queryParam("title", title)
+                        .build())
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(response -> {
+                    return (String) response.get("title");
+                })
+                .flatMap(equipment -> {
+                    return webClient.get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .scheme("http")
+                                    .host("localhost")
+                                    .port(8080)
+                                    .path("/api/user/client/getClientByEmail")
+                                    .queryParam("email", clientEmail)
+                                    .build())
+                            .retrieve()
+                            .bodyToMono(Map.class)
+                            .map(response -> {
+                                String email = (String) response.get("email"); // Cast is necessary
+                                return Tuples.of(equipment, email);
+                            });
 
-        reservationWindowRepository.save(reservationWindow);
+                })
+                .subscribe(resultTuple -> {
+                    String equipment = resultTuple.getT1();
+                    String client = resultTuple.getT2();
+                    ReservationWindow reservationWindow = ReservationWindow.builder()
+                            .duration(reservationWindowCreateRequest.getDuration())
+                            .title(reservationWindowCreateRequest.getTitle())
+                            .startDate(startDateTime)
+                            .endDate(endDateTime)
+                            .titleOfEquipment(equipment)
+                            .clientEmail(client)
+                            .build();
+                    reservationWindowRepository.save(reservationWindow);
+                });
     }
 
-    public void addMeetingTime(String titleOfResWindow, String meetingDate) {
-        ReservationWindow reservationWindow = reservationWindowRepository.findByTitle(titleOfResWindow);
+    public void addMeetingTime(ReservationWindowAddedTime reservationWindowAddedTime) {
+        ReservationWindow reservationWindow = reservationWindowRepository.findByTitle(reservationWindowAddedTime.getTitle());
         if (reservationWindow == null) {
             log.error("Reservation window not found");
         }else {
-            reservationWindow.setMeetingDate(meetingDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime meetingDateTime = LocalDateTime.parse(reservationWindowAddedTime.getMeetingDate(), formatter);
+            reservationWindow.setMeetingDate(meetingDateTime);
             reservationWindowRepository.save(reservationWindow);
+            log.info("Meeting time {} added to reservation window: {}",reservationWindow.getMeetingDate(), reservationWindow.getTitle());
+        }
+    }
+
+    public ReservationWindowResponse getReservationWindowByTitle(String title) {
+        ReservationWindow reservationWindow = reservationWindowRepository.findByTitle(title);
+        if (reservationWindow == null) {
+            log.error("Reservation window not found");
+        }
+        assert reservationWindow != null;
+        if (reservationWindow.getMeetingDate() != null) {
+            log.info("Meeting time: {}", reservationWindow.getMeetingDate());
+            return ReservationWindowResponse.builder()
+                    .title(reservationWindow.getTitle())
+                    .startDate(reservationWindow.getStartDate().toString())
+                    .endDate(reservationWindow.getEndDate().toString())
+                    .equipmentTitle(reservationWindow.getTitleOfEquipment())
+                    .clientEmail(reservationWindow.getClientEmail())
+                    .meetingDate(reservationWindow.getMeetingDate().toString())
+                    .build();
+        }else {
+            ReservationWindowResponse reservationWindowResponse = ReservationWindowResponse.builder()
+                    .title(reservationWindow.getTitle())
+                    .startDate(reservationWindow.getStartDate().toString())
+                    .endDate(reservationWindow.getEndDate().toString())
+                    .equipmentTitle(reservationWindow.getTitleOfEquipment())
+                    .clientEmail(reservationWindow.getClientEmail())
+                    .build();
+            log.info("Reservation window: {}", reservationWindowResponse.getTitle());
+            return reservationWindowResponse;
         }
     }
 }

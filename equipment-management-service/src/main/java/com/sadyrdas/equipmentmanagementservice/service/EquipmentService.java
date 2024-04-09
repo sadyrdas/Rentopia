@@ -74,8 +74,15 @@ public class EquipmentService {
         return newEquipmentRespons;
     }
 
-    public Optional<Equipment> getEquipmentByTitle(String title){
-        return equipmentRepository.findByTitle(title);
+    public NewEquipmentResponse getEquipmentByTitle(String title){
+        Optional<Equipment> equipment = equipmentRepository.findByTitle(title);
+        if (equipment.isEmpty()) {
+            log.error("Equipment {} not found", title);
+        }
+        NewEquipmentResponse newEquipmentResponse = new NewEquipmentResponse();
+        newEquipmentResponse.setTitle(equipment.get().getTitle());
+        newEquipmentResponse.setEquipmentStatus(equipment.get().getStatus());
+        return newEquipmentResponse;
     }
 
 
