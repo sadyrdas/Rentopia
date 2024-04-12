@@ -7,8 +7,10 @@ import com.sadyrdas.equipmentreservationservice.model.ReservationWindow;
 import com.sadyrdas.equipmentreservationservice.repository.ReservationWindowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
@@ -20,7 +22,7 @@ import java.util.Map;
 @Slf4j
 public class ReservationWindowService {
     private final ReservationWindowRepository reservationWindowRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public void createReservationWindow(ReservationWindowCreateRequest reservationWindowCreateRequest) {
         String title = reservationWindowCreateRequest.getEquipmentTitle();
@@ -30,29 +32,31 @@ public class ReservationWindowService {
         LocalDateTime endDateTime = startDateTime.plusHours(reservationWindowCreateRequest.getDuration());
 
         //TODO Add info about client and about equipment, which were added
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("localhost")
-                        .port(8081)
-                        .path("/api/equipment/management/getEquipmentByTitle")
+        webClientBuilder.build().get()
+                .uri("http://equipment-management-service/api/equipment/management/getEquipmentByTitle",
+                        uriBuilder -> uriBuilder
                         .queryParam("title", title)
                         .build())
                 .retrieve()
+                .onStatus(HttpStatus::is5xxServerError, response-> {
+                    return Mono.error(new RuntimeException("Service is unavailable"));
+                })
                 .bodyToMono(Map.class)
                 .map(response -> {
                     return (String) response.get("title");
                 })
                 .flatMap(equipment -> {
-                    return webClient.get()
+                    return webClientBuilder.build().get()
                             .uri(uriBuilder -> uriBuilder
                                     .scheme("http")
-                                    .host("localhost")
-                                    .port(8080)
+                                    .host("account-management-service")
                                     .path("/api/user/client/getClientByEmail")
                                     .queryParam("email", clientEmail)
                                     .build())
                             .retrieve()
+                            .onStatus(HttpStatus::is5xxServerError, response-> {
+                                return Mono.error(new RuntimeException("Service is unavailable"));
+                            })
                             .bodyToMono(Map.class)
                             .map(response -> {
                                 String email = (String) response.get("email"); // Cast is necessary

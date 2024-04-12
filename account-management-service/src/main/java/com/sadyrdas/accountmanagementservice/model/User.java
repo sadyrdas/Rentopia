@@ -1,6 +1,6 @@
 package com.sadyrdas.accountmanagementservice.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

@@ -1,10 +1,7 @@
 package com.sadyrdas.accountmanagementservice.model;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
