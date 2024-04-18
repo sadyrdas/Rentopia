@@ -1,6 +1,6 @@
 package com.sadyrdas.equipmentreservationservice.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;

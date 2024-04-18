@@ -4,7 +4,6 @@ import com.sadyrdas.equipmentmanagementservice.dto.DescriptionRequest;
 import com.sadyrdas.equipmentmanagementservice.dto.NewEquipmentRequest;
 import com.sadyrdas.equipmentmanagementservice.dto.NewEquipmentResponse;
 import com.sadyrdas.equipmentmanagementservice.dto.UpdateStatusEquipment;
-import com.sadyrdas.equipmentmanagementservice.model.Equipment;
 import com.sadyrdas.equipmentmanagementservice.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/equipment/management")

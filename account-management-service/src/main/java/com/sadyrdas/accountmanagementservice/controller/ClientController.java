@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user/client")
+@RequestMapping("/api/client")
 @RequiredArgsConstructor
 public class ClientController {
     private final ClientService clientService;

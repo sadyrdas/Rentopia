@@ -40,6 +40,7 @@ public class ClientService {
             userResponse.setName(user.getName());
             userResponse.setSurname(user.getSurname());
             userResponse.setNickName(user.getNickName());
+            userResponse.setEmail(user.getEmail());
             clientResponseList.add(userResponse);
         }
         log.info("You got all clients. Count is {}", clientResponseList.size());

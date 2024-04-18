@@ -7,10 +7,8 @@ import com.sadyrdas.equipmentreservationservice.model.ReservationWindow;
 import com.sadyrdas.equipmentreservationservice.repository.ReservationWindowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
@@ -38,25 +36,17 @@ public class ReservationWindowService {
                         .queryParam("title", title)
                         .build())
                 .retrieve()
-                .onStatus(HttpStatus::is5xxServerError, response-> {
-                    return Mono.error(new RuntimeException("Service is unavailable"));
-                })
                 .bodyToMono(Map.class)
                 .map(response -> {
                     return (String) response.get("title");
                 })
                 .flatMap(equipment -> {
                     return webClientBuilder.build().get()
-                            .uri(uriBuilder -> uriBuilder
-                                    .scheme("http")
-                                    .host("account-management-service")
-                                    .path("/api/user/client/getClientByEmail")
+                            .uri("http://account-management-service/api/client/getClientByEmail",
+                                    uriBuilder -> uriBuilder
                                     .queryParam("email", clientEmail)
                                     .build())
                             .retrieve()
-                            .onStatus(HttpStatus::is5xxServerError, response-> {
-                                return Mono.error(new RuntimeException("Service is unavailable"));
-                            })
                             .bodyToMono(Map.class)
                             .map(response -> {
                                 String email = (String) response.get("email"); // Cast is necessary
