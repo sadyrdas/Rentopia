@@ -66,4 +66,10 @@ public class EquipmentController {
         return equipment;
     }
 
+    @GetMapping("/getEquipmentByAvailability/{availability}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<NewEquipmentResponse> getEquipmentByAvailability(@PathVariable boolean availability){
+        return equipmentService.getAvailableEquipments(availability);
+    }
+
 }

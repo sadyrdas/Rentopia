@@ -10,6 +10,7 @@ import com.sadyrdas.equipmentmanagementservice.repository.DescriptionRepository;
 import com.sadyrdas.equipmentmanagementservice.repository.EquipmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -115,5 +116,18 @@ public class EquipmentService {
         }else {
             log.error("Equipment {} not found", title);
         }
+    }
+
+    public List<NewEquipmentResponse> getAvailableEquipments(boolean availability){
+        List<Equipment> equipmentList = equipmentRepository.getEquipmentsByAvailability(availability);
+        List<NewEquipmentResponse> equipmentResponseList = new ArrayList<>();
+        for (Equipment equipment : equipmentList) {
+            equipmentResponseList.add(NewEquipmentResponse.builder()
+                    .title(equipment.getTitle())
+                    .equipmentStatus(equipment.getStatus())
+                    .build());
+            log.info("Equipment {} is available", equipment.getTitle());
+        }
+        return equipmentResponseList;
     }
 }
