@@ -41,7 +41,7 @@ public class ReservationWindowService {
                 .flatMap(equipmentResponse -> {
                     String equipmentStatus = (String) equipmentResponse.get("equipmentStatus");
 
-                    if (equipmentStatus.equals("TAKEN") || equipmentStatus.equals("BROKEN")) {
+                    if (equipmentStatus != null && equipmentStatus.equals("TAKEN") || equipmentStatus.equals("BROKEN")) {
                         return Mono.error(new ExceptionUnavailableEquipment("Equipment is already taken or broken"));
                     } else {
                         return webClientBuilder.build().get()
@@ -68,8 +68,7 @@ public class ReservationWindowService {
                             .clientEmail(client)
                             .build();
 
-                    reservationWindowRepository.save(reservationWindow);
-                    return Mono.just((Void) null);
+                    return Mono.just(reservationWindowRepository.save(reservationWindow)).then(Mono.empty());
                 });
     }
 

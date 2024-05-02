@@ -23,9 +23,7 @@ public class ReservationWindowController {
         return reservationWindowService.createReservationWindow(reservationWindowCreateRequest)
                 .then(Mono.just(ResponseEntity.ok().build()))
                 .onErrorResume(ExceptionUnavailableEquipment.class,
-                        e -> Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).body("Equipment is already taken or broken")))
-                .onErrorResume(Exception.class,
-                        e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error occurred")));
+                        e -> Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).body("Equipment is already taken or broken")));
     }
 
 
