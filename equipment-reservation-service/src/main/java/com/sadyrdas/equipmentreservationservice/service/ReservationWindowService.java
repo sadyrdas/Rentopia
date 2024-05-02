@@ -3,12 +3,14 @@ package com.sadyrdas.equipmentreservationservice.service;
 import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowAddedTime;
 import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowCreateRequest;
 import com.sadyrdas.equipmentreservationservice.dto.ReservationWindowResponse;
+import com.sadyrdas.equipmentreservationservice.exception.ExceptionUnavailableEquipment;
 import com.sadyrdas.equipmentreservationservice.model.ReservationWindow;
 import com.sadyrdas.equipmentreservationservice.repository.ReservationWindowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
@@ -22,41 +24,41 @@ public class ReservationWindowService {
     private final ReservationWindowRepository reservationWindowRepository;
     private final WebClient.Builder webClientBuilder;
 
-    public void createReservationWindow(ReservationWindowCreateRequest reservationWindowCreateRequest) {
+    public Mono<Void> createReservationWindow(ReservationWindowCreateRequest reservationWindowCreateRequest) {
         String title = reservationWindowCreateRequest.getEquipmentTitle();
         String clientEmail = reservationWindowCreateRequest.getClientEmail();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime startDateTime = LocalDateTime.parse(reservationWindowCreateRequest.getStartDate(), formatter);
         LocalDateTime endDateTime = startDateTime.plusHours(reservationWindowCreateRequest.getDuration());
 
-        //TODO Add info about client and about equipment, which were added
-        webClientBuilder.build().get()
+        return webClientBuilder.build().get()
                 .uri("http://equipment-management-service/api/equipment/management/getEquipmentByTitle",
                         uriBuilder -> uriBuilder
-                        .queryParam("title", title)
-                        .build())
+                                .queryParam("title", title)
+                                .build())
                 .retrieve()
                 .bodyToMono(Map.class)
-                .map(response -> {
-                    return (String) response.get("title");
-                })
-                .flatMap(equipment -> {
-                    return webClientBuilder.build().get()
-                            .uri("http://account-management-service/api/client/getClientByEmail",
-                                    uriBuilder -> uriBuilder
-                                    .queryParam("email", clientEmail)
-                                    .build())
-                            .retrieve()
-                            .bodyToMono(Map.class)
-                            .map(response -> {
-                                String email = (String) response.get("email"); // Cast is necessary
-                                return Tuples.of(equipment, email);
-                            });
+                .flatMap(equipmentResponse -> {
+                    String equipmentStatus = (String) equipmentResponse.get("equipmentStatus");
 
+                    if (equipmentStatus.equals("TAKEN") || equipmentStatus.equals("BROKEN")) {
+                        return Mono.error(new ExceptionUnavailableEquipment("Equipment is already taken or broken"));
+                    } else {
+                        return webClientBuilder.build().get()
+                                .uri("http://account-management-service/api/client/getClientByEmail",
+                                        uriBuilder -> uriBuilder
+                                                .queryParam("email", clientEmail)
+                                                .build())
+                                .retrieve()
+                                .bodyToMono(Map.class)
+                                .map(clientResponse -> Tuples.of(clientResponse.get("email"), equipmentResponse));
+                    }
                 })
-                .subscribe(resultTuple -> {
-                    String equipment = resultTuple.getT1();
-                    String client = resultTuple.getT2();
+                .flatMap(resultTuple -> {
+                    String client = (String) resultTuple.getT1();
+                    Map<String, Object> equipmentResponse = resultTuple.getT2();
+                    String equipment = (String) equipmentResponse.get("title");
+
                     ReservationWindow reservationWindow = ReservationWindow.builder()
                             .duration(reservationWindowCreateRequest.getDuration())
                             .title(reservationWindowCreateRequest.getTitle())
@@ -65,9 +67,13 @@ public class ReservationWindowService {
                             .titleOfEquipment(equipment)
                             .clientEmail(client)
                             .build();
+
                     reservationWindowRepository.save(reservationWindow);
+                    return Mono.just((Void) null);
                 });
     }
+
+
 
     public void addMeetingTime(ReservationWindowAddedTime reservationWindowAddedTime) {
         ReservationWindow reservationWindow = reservationWindowRepository.findByTitle(reservationWindowAddedTime.getTitle());
