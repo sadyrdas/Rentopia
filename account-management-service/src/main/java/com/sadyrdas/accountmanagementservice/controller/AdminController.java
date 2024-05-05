@@ -5,7 +5,6 @@ import com.sadyrdas.accountmanagementservice.dto.UserResponse;
 import com.sadyrdas.accountmanagementservice.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,6 @@ public class AdminController {
     }
 
     @GetMapping("/allAdmins")
-    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(value = HttpStatus.OK)
     public List<UserResponse> getAllAdmins(){
         return adminService.getAllAdmins();
