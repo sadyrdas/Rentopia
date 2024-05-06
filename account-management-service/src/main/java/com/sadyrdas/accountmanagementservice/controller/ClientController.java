@@ -3,7 +3,6 @@ package com.sadyrdas.accountmanagementservice.controller;
 import com.sadyrdas.accountmanagementservice.dto.UserRequest;
 import com.sadyrdas.accountmanagementservice.dto.UserResponse;
 import com.sadyrdas.accountmanagementservice.model.User;
-import com.sadyrdas.accountmanagementservice.model.UserRole;
 import com.sadyrdas.accountmanagementservice.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
