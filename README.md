@@ -32,4 +32,4 @@ To set up and start the project, follow these steps:
 Go to Eureka Dashboard http://localhost:8761 to see registered services. The API and endpoints were manually tested using Postman.
 ## Wireframes
 To check future UI and look flow of app, you can use this link to redirect to detailed wireframes with with an opportunity to set variables in form 
-https://www.figma.com/proto/zOSz3TgMIG39Jlugn9frJu/Rentopia-Wireframes?type=design&node-id=49-2253&t=MyUi5rV2ZXxb8cL6-0&scaling=scale-down&page-id=15%3A2725&starting-point-node-id=317%3A4902
+https://www.figma.com/proto/zOSz3TgMIG39Jlugn9frJu/Rentopia-Wireframes?node-id=317-4902&t=oPYTngC14FJye6QD-0&scaling=scale-down&page-id=15%3A2725&starting-point-node-id=317%3A4902
