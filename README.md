@@ -21,4 +21,10 @@ To set up and start the project, follow these steps:
 
 1. **Clone the repository**
    ```bash
-   git clone 
+   git clone https://gitlab.fel.cvut.cz/sadyrdas/bachelor-projekt.git
+2. **Redirect to directory scriptFar**
+   ```bash
+   cd scriptFar
+3. **Run script**
+   ```bash
+   start_app.bat
