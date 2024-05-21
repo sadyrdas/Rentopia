@@ -36,6 +36,6 @@ If you will have problem with jar files. Then i suggest to recreate jar files of
 2. **Redirect to service directory**
    ```bash
    mvn clean package
-Use this step 2 for every service
+   Use this step 2 for every service
 3. **Move created jar files to scriptFar directory**
 
