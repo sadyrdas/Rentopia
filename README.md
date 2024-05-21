@@ -28,3 +28,5 @@ To set up and start the project, follow these steps:
 3. **Run script**
    ```bash
    start_app.bat
+## Checking 
+Go to Eureka Dashboard http://localhost:8761 to see registered services. The API and endpoints were manually tested using Postman.
