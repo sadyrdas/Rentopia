@@ -21,21 +21,11 @@ To set up and start the project, follow these steps:
 
 1. **Clone the repository**
    ```bash
-   git clone https://gitlab.fel.cvut.cz/sadyrdas/bachelor-projekt.git
-2. **Redirect to directory scriptFar**
-   ```bash
-   cd scriptFar
-3. **Run script**
-   ```bash
-   start_app.bat
-## Have problem with jar files
-If you will have problem with jar files. Then i suggest to recreate jar files of every service
-1. **Clone the repository**
-   ```bash
-   git clone https://gitlab.fel.cvut.cz/sadyrdas/bachelor-projekt.git
-2. **Redirect to service directory**
-   ```bash
-   mvn clean package
-   Use this step 2 for every service
-3. **Move created jar files to scriptFar directory**
+   git clone https://gitlab.fel.cvut.cz/sadyrdas/bachelor-projekt.gi
+
+## Checking 
+Go to Eureka Dashboard http://localhost:8761 to see registered services. The API and endpoints were manually tested using Postman.
+## Wireframes
+To check future UI and look flow of app, you can use this link to redirect to detailed wireframes with with an opportunity to set variables in form 
+https://www.figma.com/proto/zOSz3TgMIG39Jlugn9frJu/Rentopia-Wireframes?node-id=317-4902&t=oPYTngC14FJye6QD-0&scaling=scale-down&page-id=15%3A2725&starting-point-node-id=317%3A4902
 
