@@ -28,3 +28,14 @@ To set up and start the project, follow these steps:
 3. **Run script**
    ```bash
    start_app.bat
+## Have problem with jar files
+If you will have problem with jar files. Then i suggest to recreate jar files of every service
+1. **Clone the repository**
+   ```bash
+   git clone https://gitlab.fel.cvut.cz/sadyrdas/bachelor-projekt.git
+2. **Redirect to service directory**
+   ```bash
+   mvn clean package
+   Use this step 2 for every service
+3. **Move created jar files to scriptFar directory**
+
