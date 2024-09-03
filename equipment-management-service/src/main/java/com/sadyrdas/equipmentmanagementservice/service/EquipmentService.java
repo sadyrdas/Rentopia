@@ -10,7 +10,6 @@ import com.sadyrdas.equipmentmanagementservice.repository.DescriptionRepository;
 import com.sadyrdas.equipmentmanagementservice.repository.EquipmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -65,14 +64,14 @@ public class EquipmentService {
 
     public List<NewEquipmentResponse> getAllEquipment(){
         List<Equipment> equipmentList = equipmentRepository.findAll();
-        List<NewEquipmentResponse> newEquipmentRespons = new ArrayList<>();
+        List<NewEquipmentResponse> newEquipmentResponseList = new ArrayList<>();
         for (Equipment equipment : equipmentList) {
             NewEquipmentResponse newEquipmentResponse = new NewEquipmentResponse();
             newEquipmentResponse.setTitle(equipment.getTitle());
             newEquipmentResponse.setEquipmentStatus(equipment.getStatus());
-            newEquipmentRespons.add(newEquipmentResponse);
+            newEquipmentResponseList.add(newEquipmentResponse);
         }
-        return newEquipmentRespons;
+        return newEquipmentResponseList;
     }
 
     public NewEquipmentResponse getEquipmentByTitle(String title){
@@ -81,8 +80,10 @@ public class EquipmentService {
             log.error("Equipment {} not found", title);
         }
         NewEquipmentResponse newEquipmentResponse = new NewEquipmentResponse();
-        newEquipmentResponse.setTitle(equipment.get().getTitle());
-        newEquipmentResponse.setEquipmentStatus(equipment.get().getStatus());
+        if (equipment.isPresent()) {
+            newEquipmentResponse.setTitle(equipment.get().getTitle());
+            newEquipmentResponse.setEquipmentStatus(equipment.get().getStatus());
+        }
         return newEquipmentResponse;
     }
 

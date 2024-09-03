@@ -3,6 +3,7 @@ package com.sadyrdas.accountmanagementservice.controller;
 import com.sadyrdas.accountmanagementservice.dto.UserRequest;
 import com.sadyrdas.accountmanagementservice.dto.UserResponse;
 import com.sadyrdas.accountmanagementservice.service.AdminService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class AdminController {
 
     @PostMapping("/register")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void registerAdmin(@RequestBody UserRequest userRequest){
+    public void registerAdmin(@Valid @RequestBody UserRequest userRequest){
         adminService.registerAdmin(userRequest);
     }
 

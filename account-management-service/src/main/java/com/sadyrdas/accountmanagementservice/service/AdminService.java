@@ -2,14 +2,17 @@ package com.sadyrdas.accountmanagementservice.service;
 
 import com.sadyrdas.accountmanagementservice.dto.UserRequest;
 import com.sadyrdas.accountmanagementservice.dto.UserResponse;
+import com.sadyrdas.accountmanagementservice.exception.EmailAlreadyExists;
 import com.sadyrdas.accountmanagementservice.model.Admin;
 import com.sadyrdas.accountmanagementservice.model.Client;
 import com.sadyrdas.accountmanagementservice.model.User;
 import com.sadyrdas.accountmanagementservice.model.UserRole;
 import com.sadyrdas.accountmanagementservice.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +20,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class AdminService {
     private final UserRepository userRepository;
 
-    public void registerAdmin(UserRequest userRequest) {
+    public void registerAdmin(@Valid UserRequest userRequest) {
+        if (userRepository.existsByEmail(userRequest.getEmail())){
+            log.error("Admin with email {} already exists", userRequest.getEmail());
+            throw new EmailAlreadyExists("Admin with email " + userRequest.getEmail() + " already exists");
+        }
         User user = Admin.builder()
                 .name(userRequest.getName())
                 .surname(userRequest.getSurname())

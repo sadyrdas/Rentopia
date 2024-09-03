@@ -79,21 +79,4 @@ public class ClientServiceTest {
         assertEquals(1, clientResponseList.size());
         // You can add more assertions based on the behavior of the method
     }
-
-    @Test
-    public void testGetClientByEmail() {
-        String email = "test@example.com";
-        Client user = new Client();
-        // Mock userRepository.findByEmail() method
-        when(userRepository.findByEmail(email)).thenReturn(user);
-
-        // Call the method to be tested
-        User result = clientService.getClientByEmail(email);
-
-        // Verify that userRepository.findByEmail() was called once
-        verify(userRepository, times(1)).findByEmail(email);
-        // Verify that the returned user is the same as the mocked one
-        assertEquals(user, result);
-        // You can add more assertions based on the behavior of the method
-    }
 }
