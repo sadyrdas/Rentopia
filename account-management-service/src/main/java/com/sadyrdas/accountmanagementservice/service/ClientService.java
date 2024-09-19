@@ -1,9 +1,9 @@
 package com.sadyrdas.accountmanagementservice.service;
 
+import com.sadyrdas.accountmanagementservice.dto.LoginUserDTO;
 import com.sadyrdas.accountmanagementservice.dto.UserRequest;
 import com.sadyrdas.accountmanagementservice.dto.UserResponse;
 import com.sadyrdas.accountmanagementservice.exception.EmailAlreadyExists;
-import com.sadyrdas.accountmanagementservice.exception.UserNotFoundException;
 import com.sadyrdas.accountmanagementservice.model.Client;
 import com.sadyrdas.accountmanagementservice.model.User;
 import com.sadyrdas.accountmanagementservice.model.UserRole;
@@ -11,7 +11,9 @@ import com.sadyrdas.accountmanagementservice.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,22 +28,33 @@ import java.util.List;
 public class ClientService {
 
     private final UserRepository userRepository;
-    public void registerClient(@Valid UserRequest userRequest) {
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final AuthenticationManager authenticationManager;
+    public Client registerClient(@Valid UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())){
             log.error("Client with email {} already exists", userRequest.getEmail());
             throw new EmailAlreadyExists("Client with email " + userRequest.getEmail() + " already exists");
         }
-        User user = Client.builder()
+        Client client = Client.builder()
                 .name(userRequest.getName())
                 .surname(userRequest.getSurname())
                 .email(userRequest.getEmail())
                 .nickName(userRequest.getNickName())
                 .phoneNumber(userRequest.getPhoneNumber())
-                .password(userRequest.getPassword())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .role(UserRole.CLIENT)
                 .build();
-        userRepository.save(user);
-        log.info("Client with email {} was successfully registered", user.getEmail());
+        log.info("Client with email {} was successfully registered", client.getEmail());
+        return userRepository.save(client);
+    }
+
+    public Client authenticate(LoginUserDTO userRequest) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userRequest.getEmail(),
+                userRequest.getPassword()));
+        return (Client) userRepository.findByEmail(userRequest.getEmail()).orElseThrow();
     }
 
     public List<UserResponse> getAllClients() {
